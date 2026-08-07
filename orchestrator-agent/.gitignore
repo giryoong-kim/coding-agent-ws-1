@@ -1,0 +1,8 @@
+.venv/
+__pycache__/
+*.pyc
+.bedrock_agentcore/
+agentcore/.cli/
+.env.local
+orchestrator/
+src/
