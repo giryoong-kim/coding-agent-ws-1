@@ -1,8 +1,8 @@
 import { api } from './client'
-import type { Comment, CommentsResponse } from '../types'
+import type { Comment } from '../types'
 
-export function listComments(issueId: string): Promise<CommentsResponse> {
-  return api.get<CommentsResponse>(`/issues/${encodeURIComponent(issueId)}/comments`)
+export function listComments(issueId: string): Promise<Comment[]> {
+  return api.get<Comment[]>(`/issues/${encodeURIComponent(issueId)}/comments`)
 }
 
 export function addComment(issueId: string, body: string): Promise<Comment> {

@@ -1,26 +1,34 @@
 import { useState, useCallback } from 'react'
-import type { IssueListResponse, IssueStatus } from '../types'
+import type { Issue, IssueStatus, IssueSummary } from '../types'
 import { listIssues } from '../api/issues'
+import { getSummary } from '../api/summary'
 import { IssueCard } from './IssueCard'
 import { SummaryBar } from './SummaryBar'
 import { StatusFilter } from './StatusFilter'
 import { useAsyncData } from '../hooks/useAsyncData'
 
 interface Props {
-  /** Called after a new issue is created so the list refreshes. */
+  /** Increment to trigger a list + summary refresh after a new issue is created. */
   refreshKey?: number
 }
 
 export function IssueList({ refreshKey }: Props) {
   const [statusFilter, setStatusFilter] = useState<IssueStatus | undefined>(undefined)
 
-  const fetcher = useCallback(
+  const issuesFetcher = useCallback(
     () => listIssues(statusFilter),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [statusFilter, refreshKey],
   )
 
-  const { data, loading, error } = useAsyncData<IssueListResponse>(fetcher)
+  const summaryFetcher = useCallback(
+    () => getSummary(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [refreshKey],
+  )
+
+  const { data: issues, loading: issuesLoading, error: issuesError } = useAsyncData<Issue[]>(issuesFetcher)
+  const { data: summary, loading: summaryLoading, error: summaryError } = useAsyncData<IssueSummary>(summaryFetcher)
 
   return (
     <section className="issue-list-section">
@@ -28,32 +36,43 @@ export function IssueList({ refreshKey }: Props) {
         <StatusFilter value={statusFilter} onChange={setStatusFilter} />
       </div>
 
-      {data && <SummaryBar summary={data.summary} />}
+      {summaryLoading && !summary && (
+        <div className="state-loading" role="status" aria-live="polite">
+          Loading summary…
+        </div>
+      )}
+      {summaryError && (
+        <div className="state-error" role="alert">
+          <strong>Failed to load summary</strong>
+          <p>{summaryError.message}</p>
+        </div>
+      )}
+      {summary && <SummaryBar summary={summary} />}
 
-      {loading && (
+      {issuesLoading && (
         <div className="state-loading" role="status" aria-live="polite">
           Loading issues…
         </div>
       )}
 
-      {error && (
+      {issuesError && (
         <div className="state-error" role="alert">
           <strong>Failed to load issues</strong>
-          <p>{error.message}</p>
+          <p>{issuesError.message}</p>
         </div>
       )}
 
-      {data && !loading && (
+      {issues && !issuesLoading && (
         <>
-          {data.issues.length === 0 ? (
+          {issues.length === 0 ? (
             <div className="state-empty">
               {statusFilter
                 ? `No issues with status "${statusFilter}".`
-                : 'No issues yet. Create one above.'}
+                : 'No issues yet. Create one using the form.'}
             </div>
           ) : (
             <ul className="issue-list" aria-label="Issues">
-              {data.issues.map((issue) => (
+              {issues.map((issue) => (
                 <li key={issue.id}>
                   <IssueCard issue={issue} />
                 </li>

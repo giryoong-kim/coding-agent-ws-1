@@ -3,7 +3,7 @@
 export type IssueStatus = 'open' | 'in_progress' | 'done'
 
 export interface Issue {
-  id: string          // UUID v4
+  id: string          // opaque, non-empty
   title: string
   description: string
   status: IssueStatus
@@ -12,8 +12,8 @@ export interface Issue {
 }
 
 export interface Comment {
-  id: string          // UUID v4
-  issueId: string     // UUID v4
+  id: string          // opaque, non-empty
+  issueId: string
   body: string
   createdAt: string   // ISO 8601
 }
@@ -22,15 +22,6 @@ export interface IssueSummary {
   open: number
   in_progress: number
   done: number
-}
-
-export interface IssueListResponse {
-  issues: Issue[]
-  summary: IssueSummary
-}
-
-export interface CommentsResponse {
-  comments: Comment[]
 }
 
 export interface ApiError {

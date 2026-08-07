@@ -1,13 +1,9 @@
 import { api } from './client'
-import type {
-  Issue,
-  IssueListResponse,
-  IssueStatus,
-} from '../types'
+import type { Issue, IssueStatus } from '../types'
 
-export function listIssues(status?: IssueStatus): Promise<IssueListResponse> {
+export function listIssues(status?: IssueStatus): Promise<Issue[]> {
   const qs = status ? `?status=${encodeURIComponent(status)}` : ''
-  return api.get<IssueListResponse>(`/issues${qs}`)
+  return api.get<Issue[]>(`/issues${qs}`)
 }
 
 export function getIssue(id: string): Promise<Issue> {
