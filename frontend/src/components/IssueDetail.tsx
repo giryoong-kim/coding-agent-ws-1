@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { getIssue } from '../api/issues'
 import { listComments } from '../api/comments'
-import type { Issue, CommentsResponse } from '../types'
+import type { Issue, Comment } from '../types'
 import { STATUS_LABELS } from '../types'
 import { StatusControl } from './StatusControl'
 import { CommentThread } from './CommentThread'
@@ -27,7 +27,7 @@ export function IssueDetail({ issueId }: Props) {
   )
 
   const { data: issue, loading: issueLoading, error: issueError } = useAsyncData<Issue>(issueFetcher)
-  const { data: commentsData, loading: commentsLoading, error: commentsError } = useAsyncData<CommentsResponse>(commentsFetcher)
+  const { data: comments, loading: commentsLoading, error: commentsError } = useAsyncData<Comment[]>(commentsFetcher)
 
   return (
     <div className="issue-detail">
@@ -105,7 +105,7 @@ export function IssueDetail({ issueId }: Props) {
           <section className="issue-comments-section" aria-label="Comments">
             <h2 className="section-heading">
               Comments
-              {commentsData && ` (${commentsData.comments.length})`}
+              {comments && ` (${comments.length})`}
             </h2>
 
             {commentsLoading && (
@@ -119,8 +119,8 @@ export function IssueDetail({ issueId }: Props) {
                 <p>{commentsError.message}</p>
               </div>
             )}
-            {commentsData && (
-              <CommentThread comments={commentsData.comments} />
+            {comments && (
+              <CommentThread comments={comments} />
             )}
 
             <AddCommentForm
