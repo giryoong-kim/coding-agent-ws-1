@@ -1,0 +1,33 @@
+.main {
+  flex: 1;
+  padding: var(--space-8) var(--space-6);
+}
+
+.container {
+  max-width: 860px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.listSection {
+  /* wraps IssueList or loading/error state */
+}
+
+.loadingWrapper {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 540px) {
+  .main {
+    padding: var(--space-4) var(--space-4);
+  }
+
+  .container {
+    gap: var(--space-4);
+  }
+}
