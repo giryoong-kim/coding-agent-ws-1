@@ -62,3 +62,10 @@ router.get('/:id/comments', (req, res) => {
 });
 
 export default router;
+
+export const summaryRouter = Router();
+
+summaryRouter.get('/', (req, res) => {
+  const result = issueService.getSummary();
+  res.status(result.status).json(result.data);
+});

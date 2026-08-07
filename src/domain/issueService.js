@@ -4,15 +4,18 @@ import * as commentRepo from '../persistence/commentRepository.js';
 import { isValidStatus, isValidTransition } from './statuses.js';
 
 export function createIssue(title, description) {
-  if (!title || typeof title !== 'string' || title.trim() === '') {
-    return { error: 'Title is required and cannot be blank', status: 400 };
+  if (title === undefined || title === null || typeof title !== 'string' || title.trim() === '') {
+    return { error: 'Title is required and cannot be empty', status: 400 };
+  }
+  if (description === undefined || description === null || typeof description !== 'string') {
+    return { error: 'Description is required (may be an empty string)', status: 400 };
   }
 
   const now = new Date().toISOString();
   const issue = {
     id: uuidv4(),
     title: title.trim(),
-    description: description || '',
+    description,
     status: 'open',
     createdAt: now,
     updatedAt: now,
@@ -28,9 +31,12 @@ export function getIssues(statusFilter) {
   }
 
   const issues = issueRepo.findIssues(statusFilter || null);
-  const summary = issueRepo.getStatusCounts();
+  return { data: issues, status: 200 };
+}
 
-  return { data: { issues, summary }, status: 200 };
+export function getSummary() {
+  const summary = issueRepo.getStatusCounts();
+  return { data: summary, status: 200 };
 }
 
 export function getIssueById(id) {
@@ -54,7 +60,7 @@ export function transitionStatus(id, newStatus) {
   if (!isValidTransition(issue.status, newStatus)) {
     return {
       error: `Invalid status transition from '${issue.status}' to '${newStatus}'. Allowed transitions: open -> in_progress, in_progress -> done`,
-      status: 400,
+      status: 422,
     };
   }
 
@@ -92,5 +98,5 @@ export function getComments(issueId) {
   }
 
   const comments = commentRepo.findCommentsByIssueId(issueId);
-  return { data: { comments }, status: 200 };
+  return { data: comments, status: 200 };
 }
